@@ -82,7 +82,9 @@ void Lab5::Init()
         // TODO(student): Load images "rain.png", "snowflake.png" and "fire.png" as
         // textures, similar to "particle2.png", loaded above. The images can be
         // found in the same directory as "particle2.png"
-
+        TextureManager::LoadTexture(PATH_JOIN(window->props.selfDir, RESOURCE_PATH::TEXTURES), "rain.png");
+        TextureManager::LoadTexture(PATH_JOIN(window->props.selfDir, RESOURCE_PATH::TEXTURES), "snowflake.png");
+        TextureManager::LoadTexture(PATH_JOIN(window->props.selfDir, RESOURCE_PATH::TEXTURES), "fire.png");
     }
 
     LoadShader("Fireworks", "Particle_fireworks", "Particle_simple", "Particle", true);
@@ -227,7 +229,12 @@ void Lab5::Update(float deltaTimeSeconds)
 
             // TODO(student): Send uniforms generator_position,
             // deltaTime and offset to the shader
-
+            int loc_generator_position = glGetUniformLocation(shader->program, "generator_position");
+            glUniform3f(loc_generator_position, generator_position.x, generator_position.y, generator_position.z);
+            int loc_deltaTime = glGetUniformLocation(shader->program, "deltaTime");
+            glUniform1f(loc_deltaTime, deltaTimeSeconds);
+            int loc_offset = glGetUniformLocation(shader->program, "offset");
+            glUniform1f(loc_offset, offset);
         }
     }
 
@@ -239,11 +246,17 @@ void Lab5::Update(float deltaTimeSeconds)
             shader->Use();
 
             // TODO(student): Send correct texture for snow
-            TextureManager::GetTexture("particle2.png")->BindToTextureUnit(GL_TEXTURE0);
+            TextureManager::GetTexture("snowflake.png")->BindToTextureUnit(GL_TEXTURE0);
             particleEffect->Render(GetSceneCamera(), shader);
 
             // TODO(student): Send uniforms generator_position,
             // deltaTime and offset to the shader
+            int loc_generator_position = glGetUniformLocation(shader->program, "generator_position");
+            glUniform3f(loc_generator_position, generator_position.x, generator_position.y, generator_position.z);
+            int loc_deltaTime = glGetUniformLocation(shader->program, "deltaTime");
+            glUniform1f(loc_deltaTime, deltaTimeSeconds);
+            int loc_offset = glGetUniformLocation(shader->program, "offset");
+            glUniform1f(loc_offset, offset);
 
         }
     }
@@ -256,11 +269,17 @@ void Lab5::Update(float deltaTimeSeconds)
             shader->Use();
 
             // TODO(student): Send correct texture for rain
-            TextureManager::GetTexture("particle2.png")->BindToTextureUnit(GL_TEXTURE0);
+            TextureManager::GetTexture("rain.png")->BindToTextureUnit(GL_TEXTURE0);
             particleEffect->Render(GetSceneCamera(), shader);
 
             // TODO(student): Send uniforms generator_position,
             // deltaTime and offset to the shader
+            int loc_generator_position = glGetUniformLocation(shader->program, "generator_position");
+            glUniform3f(loc_generator_position, generator_position.x, generator_position.y, generator_position.z);
+            int loc_deltaTime = glGetUniformLocation(shader->program, "deltaTime");
+            glUniform1f(loc_deltaTime, deltaTimeSeconds);
+            int loc_offset = glGetUniformLocation(shader->program, "offset");
+            glUniform1f(loc_offset, offset);
 
         }
     }
@@ -272,12 +291,17 @@ void Lab5::Update(float deltaTimeSeconds)
         {
             shader->Use();
             // TODO(student): Send correct texture for fire
-            TextureManager::GetTexture("particle2.png")->BindToTextureUnit(GL_TEXTURE0);
+            TextureManager::GetTexture("fire.png")->BindToTextureUnit(GL_TEXTURE0);
             particleEffect->Render(GetSceneCamera(), shader);
 
             // TODO(student): Send uniforms generator_position,
             // deltaTime and offset to the shader
-
+            int loc_generator_position = glGetUniformLocation(shader->program, "generator_position");
+            glUniform3f(loc_generator_position, generator_position.x, generator_position.y, generator_position.z);
+            int loc_deltaTime = glGetUniformLocation(shader->program, "deltaTime");
+            glUniform1f(loc_deltaTime, deltaTimeSeconds);
+            int loc_offset = glGetUniformLocation(shader->program, "offset");
+            glUniform1f(loc_offset, offset);
         }
     }
 

@@ -21,8 +21,29 @@ void main()
     // depending on the fire stage (0, 1, 2, 3), a different
     // image of a fire particle is shown.
     // Hint: each stage corresponds to a quarter of the image
-
     vec2 tex_coord = vec2(0, 0);
+    if (fire_stage == 0)
+    {
+        tex_coord = vec2(0, 0);
+    }
+    else if (fire_stage == 1)
+    {
+        tex_coord = vec2(0.25, 0);
+        tex_coord.x += texture_coord.x * 0.5;
+        tex_coord.y += texture_coord.y * 0.5;
+    }
+    else if (fire_stage == 2)
+    {
+        tex_coord = vec2(0.5, 0);
+        tex_coord.x += texture_coord.x * 0.5;
+        tex_coord.y += texture_coord.y * 0.5;
+    }
+    else if (fire_stage == 3)
+    {
+        tex_coord = vec2(0.75, 0);
+        tex_coord.x += texture_coord.x * 0.5;
+        tex_coord.y += texture_coord.y * 0.5;
+    }
     
     vec3 color = texture(texture_1, tex_coord).xyz;
     out_color = vec4(color, 1);

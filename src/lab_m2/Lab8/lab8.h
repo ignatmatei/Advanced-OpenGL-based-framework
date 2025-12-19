@@ -36,7 +36,7 @@ namespace m2
         // Processing effects
         void GrayScale();
         void SaveImage(const std::string &fileName);
-
+        void Blur(int radius);
      private:
         Texture2D *originalImage;
         Texture2D *processedImage;

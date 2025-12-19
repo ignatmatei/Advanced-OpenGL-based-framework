@@ -1,4 +1,4 @@
-#include "lab_m2/lab4/lab4.h"
+#include "lab_m2/Tema1/Tema1.h"
 
 #include <vector>
 #include <iostream>
@@ -13,17 +13,17 @@ using namespace m2;
  */
 
 
-Lab4::Lab4()
+Tema1::Tema1()
 {
 }
 
 
-Lab4::~Lab4()
+Tema1::~Tema1()
 {
 }
 
 
-void Lab4::Init()
+void Tema1::Init()
 {
     auto camera = GetSceneCamera();
     camera->SetPositionAndRotation(glm::vec3(0, 8, 8), glm::quat(glm::vec3(-40 * TO_RADIANS, 0, 0)));
@@ -34,9 +34,9 @@ void Lab4::Init()
     // Create a shader program for surface generation
     {
         Shader *shader = new Shader("SurfaceGeneration");
-        shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M2, "lab4", "shaders", "VertexShader.glsl"), GL_VERTEX_SHADER);
-        shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M2, "lab4", "shaders", "GeometryShader.glsl"), GL_GEOMETRY_SHADER);
-        shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M2, "lab4", "shaders", "FragmentShader.glsl"), GL_FRAGMENT_SHADER);
+        shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M2, "Tema1", "shaders", "VertexShader.glsl"), GL_VERTEX_SHADER);
+        shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M2, "Tema1", "shaders", "GeometryShader.glsl"), GL_GEOMETRY_SHADER);
+        shader->AddShader(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M2, "Tema1", "shaders", "FragmentShader.glsl"), GL_FRAGMENT_SHADER);
         shader->CreateAndLink();
         shaders[shader->GetName()] = shader;
     }
@@ -73,7 +73,7 @@ void Lab4::Init()
 }
 
 
-void Lab4::FrameStart()
+void Tema1::FrameStart()
 {
     // Clears the color buffer (using the previously set color) and depth buffer
     glClearColor(0, 0, 0, 1);
@@ -85,7 +85,7 @@ void Lab4::FrameStart()
 }
 
 
-void Lab4::RenderMeshInstanced(Mesh *mesh, Shader *shader, const glm::mat4 &modelMatrix, int instances, const glm::vec3 &color)
+void Tema1::RenderMeshInstanced(Mesh *mesh, Shader *shader, const glm::mat4 &modelMatrix, int instances, const glm::vec3 &color)
 {
     if (!mesh || !shader || !shader->GetProgramID())
         return;
@@ -113,7 +113,7 @@ void Lab4::RenderMeshInstanced(Mesh *mesh, Shader *shader, const glm::mat4 &mode
 }
 
 
-void Lab4::Update(float deltaTimeSeconds)
+void Tema1::Update(float deltaTimeSeconds)
 {
     ClearScreen(glm::vec3(0.121, 0.168, 0.372));
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -132,23 +132,17 @@ void Lab4::Update(float deltaTimeSeconds)
     // a curve (no_of_generated_points), as well as the characteristics for
     // creating the translation/rotation surfaces (max_translate, max_rotate).
     // NOTE: If you're feeling lost and need a frame of reference while doing
-    // this lab, go to `FrameEnd()` and activate `DrawCoordinateSystem()`.
-    glUniform1i(glGetUniformLocation(shader->program, "no_of_generated_points"),
-            no_of_generated_points);
-
-    glUniform1f(glGetUniformLocation(shader->program, "max_translate"),
-            max_translate);
-
-glUniform1f(glGetUniformLocation(shader->program, "max_rotate"),
-            max_rotate);
+    // this lab, go to `FrameEnd()` and activate `DrawCoordinateSystem()`
+    glUniform1i(glGetUniformLocation(shader->program, "no_of_generated_points"), no_of_generated_points);
+    glUniform1f(glGetUniformLocation(shader->program, "max_translate"), max_translate);
+    glUniform1f(glGetUniformLocation(shader->program, "max_rotate"), max_rotate);
     Mesh* mesh = meshes["surface"];
-
     // Draw the object instanced
     RenderMeshInstanced(mesh, shader, glm::mat4(1), no_of_instances);
 }
 
 
-void Lab4::FrameEnd()
+void Tema1::FrameEnd()
 {
 #if 0
     DrawCoordinateSystem();
@@ -162,7 +156,7 @@ void Lab4::FrameEnd()
  */
 
 
-void Lab4::OnInputUpdate(float deltaTime, int mods)
+void Tema1::OnInputUpdate(float deltaTime, int mods)
 {
     // Treat continuous update based on input
 
@@ -204,55 +198,54 @@ void Lab4::OnInputUpdate(float deltaTime, int mods)
 }
 
 
-void Lab4::OnKeyPress(int key, int mods)
+void Tema1::OnKeyPress(int key, int mods)
 {
     // TODO(student): Use keys to change the number of instances and the
     // number of generated points. Avoid the camera keys, and avoid the
     // the keys from `OnInputUpdate`.
-    if (key == GLFW_KEY_I)
-{
-    no_of_instances++;
-}
-// Increase / decrease number of generated points on the curve
-if (key == GLFW_KEY_O)
-{
-    no_of_generated_points++;
+    if (key == GLFW_KEY_L)
+    {
+        no_of_instances += 1;
+
+    }
+    if (key == GLFW_KEY_K)
+    {
+        no_of_generated_points += 1;
+    }
 }
 
-}
 
-
-void Lab4::OnKeyRelease(int key, int mods)
+void Tema1::OnKeyRelease(int key, int mods)
 {
     // Add key release event
 }
 
 
-void Lab4::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
+void Tema1::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
 {
     // Add mouse move event
 }
 
 
-void Lab4::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
+void Tema1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 {
     // Add mouse button press event
 }
 
 
-void Lab4::OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods)
+void Tema1::OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods)
 {
     // Add mouse button release event
 }
 
 
-void Lab4::OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY)
+void Tema1::OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY)
 {
     // Treat mouse scroll event
 }
 
 
-void Lab4::OnWindowResize(int width, int height)
+void Tema1::OnWindowResize(int width, int height)
 {
     // Treat window resize event
 }

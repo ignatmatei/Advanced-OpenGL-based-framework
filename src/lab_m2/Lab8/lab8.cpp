@@ -1,4 +1,4 @@
-#include "lab_m2/lab8/lab8.h"
+#include "lab_m2/Lab8/lab8.h"
 
 #include <vector>
 #include <iostream>
@@ -182,6 +182,58 @@ void Lab8::OpenDialog()
     }
 }
 
+void Lab8::Blur(int radius)
+{
+
+    const int w = originalImage->GetWidth();
+    const int h = originalImage->GetHeight();
+    const unsigned int channels = originalImage->GetNrChannels();
+
+    unsigned char* src = originalImage->GetImageData();
+    unsigned char* dst = processedImage->GetImageData();
+
+    if (channels < 3) return; // need at least RGB
+
+    auto clampi = [](int v, int lo, int hi) {
+        return (v < lo) ? lo : (v > hi) ? hi : v;
+    };
+
+    const int kernelSize = 2 * radius + 1;
+    const int samples = kernelSize * kernelSize;
+
+    for (int y = 0; y < h; y++)
+    {
+        for (int x = 0; x < w; x++)
+        {
+            int sumR = 0, sumG = 0, sumB = 0, sumA = 0;
+
+            for (int ky = -radius; ky <= radius; ky++)
+            {
+                int sy = clampi(y + ky, 0, h - 1);
+
+                for (int kx = -radius; kx <= radius; kx++)
+                {
+                    int sx = clampi(x + kx, 0, w - 1);
+                    int off = (sy * w + sx) * (int)channels;
+
+                    sumR += src[off + 0];
+                    sumG += src[off + 1];
+                    sumB += src[off + 2];
+                    if (channels == 4) sumA += src[off + 3];
+                }
+            }
+
+            int outOff = (y * w + x) * (int)channels;
+            dst[outOff + 0] = (unsigned char)(sumR / samples);
+            dst[outOff + 1] = (unsigned char)(sumG / samples);
+            dst[outOff + 2] = (unsigned char)(sumB / samples);
+            if (channels == 4)
+                dst[outOff + 3] = (unsigned char)(sumA / samples);
+        }
+    }
+
+    processedImage->UploadNewData(dst);
+}
 
 /*
  *  These are callback functions. To find more about callbacks and
@@ -213,14 +265,19 @@ void Lab8::OnKeyPress(int key, int mods)
         cout << "Processing on GPU: " << (gpuProcessing ? "true" : "false") << endl;
     }
 
-    if (key - GLFW_KEY_0 >= 0 && key < GLFW_KEY_3)
+    if (key - GLFW_KEY_0 >= 0 && key <= GLFW_KEY_5)
     {
         outputMode = key - GLFW_KEY_0;
 
         if (gpuProcessing == false)
         {
-            outputMode = 0;
-            GrayScale();
+           if (outputMode == 0) {
+               GrayScale();
+           } else if (outputMode == 1) {
+            // Blur
+            int blurRadius = 3;
+            Blur(blurRadius);
+           } else if (outputMode == 2) {
         }
     }
 
@@ -235,7 +292,7 @@ void Lab8::OnKeyPress(int key, int mods)
     }
 }
 
-
+}
 void Lab8::OnKeyRelease(int key, int mods)
 {
     // Add key release event

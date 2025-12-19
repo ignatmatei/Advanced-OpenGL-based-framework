@@ -1,0 +1,157 @@
+#version 330
+
+// Input
+in vec2 texture_coord;
+
+// Uniform properties
+uniform sampler2D textureImage;
+uniform ivec2 screenSize;
+uniform int flipVertical;
+uniform int outputMode = 3 ; // 0: original, 1: grayscale, 2: blur
+
+// Output
+layout(location = 0) out vec4 out_color;
+
+// Local variables
+vec2 textureCoord = vec2(texture_coord.x, (flipVertical != 0) ? 1 - texture_coord.y : texture_coord.y); // Flip texture
+
+
+vec4 grayscale()
+{
+    vec4 color = texture(textureImage, textureCoord);
+    float gray = 0.21 * color.r + 0.71 * color.g + 0.07 * color.b; 
+    return vec4(gray, gray, gray,  0);
+}
+
+
+vec4 blur(int blurRadius)
+{
+    vec2 texelSize = 1.0f / screenSize;
+    vec4 sum = vec4(0);
+    for(int i = -blurRadius; i <= blurRadius; i++)
+    {
+        for(int j = -blurRadius; j <= blurRadius; j++)
+        {
+            sum += texture(textureImage, textureCoord + vec2(i, j) * texelSize);
+        }
+    }
+        
+    float samples = pow((2 * blurRadius + 1), 2);
+    return sum / samples;
+}
+float luminance(vec3 color)
+{
+    return 0.21 * color.r + 0.71 * color.g + 0.07 * color.b;
+}
+vec4 sobel()
+{
+    vec2 texel = 1.0 / vec2(screenSize);
+
+    // Sobel kernels
+    float Gx[9] = float[](
+        -1,  0,  1,
+        -2,  0,  2,
+        -1,  0,  1
+    );
+
+    float Gy[9] = float[](
+        -1, -2, -1,
+         0,  0,  0,
+         1,  2,  1
+    );
+
+    vec2 offsets[9] = vec2[](
+        vec2(-1, -1), vec2(0, -1), vec2(1, -1),
+        vec2(-1,  0), vec2(0,  0), vec2(1,  0),
+        vec2(-1,  1), vec2(0,  1), vec2(1,  1)
+    );
+
+    float sx = 0.0;
+    float sy = 0.0;
+
+    for (int i = 0; i < 9; i++)
+    {
+        vec3 color = texture(textureImage, textureCoord + offsets[i] * texel).rgb;
+        float gray = luminance(color);
+        sx += gray * Gx[i];
+        sy += gray * Gy[i];
+    }
+
+    float edge = length(vec2(sx, sy));
+    return vec4(edge, edge, edge, 1.0);
+}
+float sobelIntensity(sampler2D tex, vec2 coord)
+{
+    vec2 texel = 1.0 / vec2(screenSize);
+
+    float Gx[9] = float[](
+        -1,  0,  1,
+        -2,  0,  2,
+        -1,  0,  1
+    );
+
+    float Gy[9] = float[](
+        -1, -2, -1,
+         0,  0,  0,
+         1,  2,  1
+    );
+
+    vec2 offsets[9] = vec2[](
+        vec2(-1, -1), vec2(0, -1), vec2(1, -1),
+        vec2(-1,  0), vec2(0,  0), vec2(1,  0),
+        vec2(-1,  1), vec2(0,  1), vec2(1,  1)
+    );
+
+    float sx = 0.0;
+    float sy = 0.0;
+
+    for (int i = 0; i < 9; i++)
+    {
+        float gray = luminance(
+            texture(tex, coord + offsets[i] * texel).rgb
+        );
+
+        sx += gray * Gx[i];
+        sy += gray * Gy[i];
+    }
+
+    return length(vec2(sx, sy));
+}
+
+vec4 simplifiedCanny () {
+    vec4 blurred = blur(2);
+
+    float gray = luminance(blurred.rgb);
+
+    float edgeStrength = sobelIntensity(textureImage, textureCoord);
+
+    float threshold = 0.25;   // adjust this
+    float edge = edgeStrength > threshold ? 1.0 : 0.0;
+
+    return vec4(edge, edge, edge, 1.0);
+}
+void main()
+{
+    switch (outputMode)
+    {
+        case 1:
+        {
+            out_color = grayscale();
+            break;
+        }
+
+        case 2:
+        {
+            out_color = blur(3);
+            break;
+        }
+        case 3: 
+        {
+            out_color = simplifiedCanny();
+            break;
+        }
+        default:
+            out_color = texture(textureImage, textureCoord);
+            break;
+    }
+}
